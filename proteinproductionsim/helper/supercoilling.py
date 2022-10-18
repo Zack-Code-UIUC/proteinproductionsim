@@ -1,4 +1,4 @@
-from variables import gamma
+from ..variables import gamma
 
 
 def s(r):

@@ -6,12 +6,12 @@ dna_strand.py
 This file contains the DNAStrand class.
 """
 
-from ProteinProductionSim.interface import Entity
-from ProteinProductionSim.variables import length, scaling, dt, total_time, v_0, pauseDuration, pauseSite, RNAP_size, t_on, tau_0, tau_c
+from proteinproductionsim.interface import Entity
+from proteinproductionsim.variables import length, scaling, dt, total_time, v_0, pauseDuration, pauseSite, RNAP_size, t_on, tau_0, tau_c
 
-from helper.loading_list import LoadingList
-from helper.supercoilling import s, n_dependence_cubic_3
-from .rnap import RNAP
+from proteinproductionsim.helper.loading_list import LoadingList
+from proteinproductionsim.helper.supercoilling import s, n_dependence_cubic_3
+from proteinproductionsim.entity.rnap import RNAP
 import numpy as np
 
 

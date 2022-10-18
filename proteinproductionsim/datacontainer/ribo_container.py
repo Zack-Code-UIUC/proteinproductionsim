@@ -7,8 +7,8 @@ This file defines the RIBOContainer class which is used by the RNAP class to sto
 
 """
 
-from interface import DataContainer
-from variables import RIBO_size, dt, k_elong, length
+from ..interface import DataContainer
+from ..variables import RIBO_size, dt, k_elong, length
 import numpy as np
 
 

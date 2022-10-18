@@ -6,7 +6,7 @@ dna_sim_controller.py
 This file defines the main controller for the simulation.
 """
 
-from ..interface import Controller, DataContainer
+from proteinproductionsim.interface import Controller, DataContainer
 from ..environment.dna_sim_environment import DNASimEnvironment
 from ..variables import stage_per_collection, dt, total_time, scaling, t_on
 from ..datacontainer.data_recorder import RNAPPositionRecorder, SingleValueRecorder, FiveThreeRecorder

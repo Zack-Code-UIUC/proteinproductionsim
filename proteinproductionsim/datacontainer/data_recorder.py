@@ -5,11 +5,11 @@ data_recorder.py
 """
 import numpy as np
 
-from interface import DataContainer, Environment, Controller
+from ..interface import DataContainer, Environment, Controller
 import matplotlib.pyplot as plt
-from entity.dna_strand import DNAStrand
-from environment.dna_sim_environment import DNASimEnvironment
-from variables import data_collection_interval, dt
+from ..entity.dna_strand import DNAStrand
+from ..environment.dna_sim_environment import DNASimEnvironment
+from ..variables import data_collection_interval, dt
 
 
 class DataRecorder(DataContainer):

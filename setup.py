@@ -7,6 +7,12 @@ setup(name='proteinproductionsim',
       author='Zelong Xiong',
       author_email='zelongx2@illinois.edu',
       license='MIT',
-      packages=['proteinproductionsim'],
+      packages=['proteinproductionsim',
+                'proteinproductionsim.controller',
+                'proteinproductionsim.datacontainer',
+                'proteinproductionsim.entity',
+                'proteinproductionsim.environment',
+                'proteinproductionsim.helper'
+                ],
       zip_safe=False
       )

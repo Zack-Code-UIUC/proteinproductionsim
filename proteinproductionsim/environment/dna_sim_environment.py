@@ -5,8 +5,8 @@ dna_sim_environment
 this file contains the Environment subclass that is used for dna_sim_controller.
 """
 
-from interface import Environment
-from entity.dna_strand import DNAStrand
+from proteinproductionsim.interface import Environment
+from proteinproductionsim.entity.dna_strand import DNAStrand
 
 
 class DNASimEnvironment(Environment):

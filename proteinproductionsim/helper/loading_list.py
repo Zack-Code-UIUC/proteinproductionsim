@@ -17,8 +17,8 @@ promoter list is different from the actual "real" promoter list, as that will be
 other DataContainer.
 """
 
-from interface import DataContainer
-from .random_generator import exponential_generator
+from proteinproductionsim.interface import DataContainer
+from proteinproductionsim.helper.random_generator import exponential_generator
 
 # Helper functions for the helper class
 

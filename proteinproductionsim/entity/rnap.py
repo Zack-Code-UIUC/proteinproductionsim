@@ -8,11 +8,11 @@ the DNA strand to conduct the transcription of messanger RNA.
 
 
 """
-from interface import Entity
-from helper.random_generator import binary_generator, exponential_generator, stepwise_exponential_generator
-from helper.loading_list import LoadingList
-from datacontainer.ribo_container import RIBOContainer
-from variables import length, kRiboLoading, ribo_loading_interval, m1, m2, t_crit, \
+from ..interface import Entity
+from ..helper.random_generator import binary_generator, exponential_generator, stepwise_exponential_generator
+from ..helper.loading_list import LoadingList
+from ..datacontainer.ribo_container import RIBOContainer
+from ..variables import length, kRiboLoading, ribo_loading_interval, m1, m2, t_crit, \
     initiation_nt, scaling, dt
 
 
