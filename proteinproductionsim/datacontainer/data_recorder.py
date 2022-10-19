@@ -14,7 +14,10 @@ from ..variables import data_collection_interval, dt
 
 class DataRecorder(DataContainer):
     """
-    This is the basis class for the data recorder.
+    This is the basis class for the data recorder. This is a successor class of the DataContainer class.
+
+    :param controller: The controller instance that owns this class. Stored in order to use callback
+    :param collection_interval: The integer interval.
     """
     def __init__(self, controller: Controller, collection_interval):
         super().__init__(controller)
@@ -162,5 +165,66 @@ class FiveThreeRecorder(DataRecorder):
                               step=1, dtype=float) * self._dt
         axe.plot(time_list, five, label='Five End')
         axe.plot(time_list, three, label='Three End')
+        # print([self._rnap_loaded, self._rnap_detached])
+        pass
+
+
+class SupercoilingRecorder(DataRecorder):
+    """
+    This class is used to record supercoiling experienced by the RNAP molecules
+
+    :param controller: the parent Controller Class
+    :param target: the target DNAStrand instance
+    :param total_time: the integer total time steps
+    """
+    def __init__(self, controller, target: DNAStrand, total_time: int, ):
+        """
+        Constructor method
+        """
+        super().__init__(controller, int(data_collection_interval / dt))
+        self._tot_time = total_time + 1
+        self._dna = target
+        self._dt = dt
+        self._data = []
+        self._length = 0
+        self._rnap_loaded = 0
+        self._rnap_detached = 0
+        self._start_end = []
+
+    def log(self, time_index: int):
+        # STEP: check RNAP amount through loaded and attached
+        if time_index % self.collection_interval == 0:
+            # STEP: check if detached increase
+            if self._dna.detached > self._rnap_detached:
+                self._start_end[self._rnap_detached][1] = time_index - 1
+                self._rnap_detached += 1
+            # STEP: check if loaded increase
+            if self._dna.loaded > self._rnap_loaded:
+                self._start_end.append([time_index, -1])
+                self._rnap_loaded += 1
+                self._data.append(np.zeros(self._tot_time))
+
+        # STEP: now we track the position.
+        for i in range(self._rnap_loaded):
+            if i < self._rnap_detached:
+                continue
+            self._data[i][self._length] = self._dna.RNAP_LIST[i].position
+
+        self._length += 1
+        pass
+
+    def plot(self, axe):
+        axe.set_xlabel('Time [s]')
+        axe.set_ylabel('Position [bps]')
+        axe.set_title('RNAP Position Plot')
+        axe.grid(True)
+        for i in range(self._rnap_loaded):
+            start_index = self._start_end[i][0]
+            stop_index = self._start_end[i][1]
+            if stop_index < 0:
+                stop_index = self._tot_time
+            time_list = np.arange(start=start_index, stop=stop_index,
+                                  step=1, dtype=float)
+            axe.plot(time_list * self._dt, self._data[i][start_index:stop_index])
         # print([self._rnap_loaded, self._rnap_detached])
         pass

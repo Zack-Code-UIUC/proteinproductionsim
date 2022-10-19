@@ -1,7 +1,5 @@
-from interface import Controller
-
-from interface import Controller
-from controller.dna_sim_controller import DNASimController
+from ..interface import Controller
+from ..controller.dna_sim_controller import DNASimController
 
 
 class MultiSampleController(Controller):

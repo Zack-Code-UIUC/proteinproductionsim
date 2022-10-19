@@ -8,8 +8,8 @@ def get_date_string():
 
 def make_directory_now(direc, name):
     """
-    Create a directory based on the target directory and inputted name. A date and time string will be attached to the
-    back of the name.
+    Create a directory based on the current working directory, the target directory and inputted name. A date and
+    time string will be attached to the back of the name.
 
     Parameters:
     direc(string): target directory
@@ -24,16 +24,17 @@ def make_directory_now(direc, name):
     now = datetime.now()
     date_string = now.strftime("%Y_%m_%d_%H_%M")
     # make the directory name
-    directory_name = name + '_ ' +date_string
+    directory_name = name + '_ ' + date_string
     # construct the whole path
-    path_directory = cwd + '/' +direc + '/' +directory_name
+    path_directory = cwd + '/' + direc + '/' + directory_name
     try:
         os.makedirs(path_directory)
     except FileExistsError:
         pass
     return path_directory
 
-def printProgressBar(iteration, total):
+
+def print_progress_bar(iteration, total):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -47,9 +48,9 @@ def printProgressBar(iteration, total):
     decimals = 2
 
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
-    filledLength = int(length * iteration // total)
-    bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'{prefix} |{bar}| {percent}% {suffix}', end = '\r')
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    print(f'{prefix} |{bar}| {percent}% {suffix}', end='\r')
 
     if iteration == total:
         print()
