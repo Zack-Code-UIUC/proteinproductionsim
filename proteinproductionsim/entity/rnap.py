@@ -71,6 +71,7 @@ class RNAP(Entity):
         self.position = 0  # means position.
         self.attached = True  # indicated if the RNAP is attached to the DNA. Will detached if reach the end.
         self.detached_time = -1
+        self.interrupted = False
 
         # Site-Pausing
         self.passed_site_1 = False  # passed_site_1 is indicating whether the RNAP has passed the pausing site.

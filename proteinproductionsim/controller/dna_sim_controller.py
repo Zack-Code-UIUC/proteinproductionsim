@@ -9,14 +9,15 @@ This file defines the main controller for the simulation.
 from proteinproductionsim.interface import Controller, DataContainer
 from ..environment.dna_sim_environment import DNASimEnvironment
 from ..variables import stage_per_collection, dt, total_time, scaling, t_on
-from ..datacontainer.data_recorder import RNAPPositionRecorder, SingleValueRecorder, FiveThreeRecorder
+from ..datacontainer.data_recorder import RNAPPositionRecorder, SingleValueRecorder, FiveThreeRecorder, \
+    SupercoilingRecorder
 
 
 class RunConfig:
     def __init__(self, controller=None, record_rnap_position: bool = False, record_rnap_amount: bool = False,
                  record_rnap_state: bool = True, record_processing_time: bool = True,
                  record_protein_amount: bool = True, record_protein_production: bool = True,
-                 record_finish_time: bool = True, record_five_three: bool = False,
+                 record_finish_time: bool = True, record_five_three: bool = False, record_supercoiling: bool = False,
                  log_data: bool = True, show_progress_bar: bool = True):
         self.parent = controller
         self.record_rnap_position = record_rnap_position
@@ -29,6 +30,7 @@ class RunConfig:
         self.record_five_three = record_five_three
         self.log_data = log_data
         self.show_progress_bar = show_progress_bar
+        self.record_supercoiling = record_supercoiling
 
 
 class DNASimController(Controller):
@@ -39,7 +41,9 @@ class DNASimController(Controller):
         super().__init__()
         # Setup
         self.time_index = 0
-        self.env = DNASimEnvironment(controller=self, rnap_loading_rate=rnap_loading_rate, **kwargs)
+        self.env = DNASimEnvironment(controller=self, rnap_loading_rate=rnap_loading_rate,
+                                     if_storing_supercoiling_value=config.record_supercoiling,
+                                     **kwargs)
         self.total_time = scaling(total_time)
         self.dt = dt
         self.stage_per_collection = stage_per_collection
@@ -70,6 +74,8 @@ class DNASimController(Controller):
                                                                        unit_x="s", unit_y="")
         if self.config.record_five_three:
             self.data_recorder["five and three"] = FiveThreeRecorder(self, self.env.dna, self.total_time)
+        if self.config.record_supercoiling:
+            self.data_recorder["supercoiling"] = SupercoilingRecorder(self, self.env.dna, self.total_time)
 
         self.env.init()
         pass

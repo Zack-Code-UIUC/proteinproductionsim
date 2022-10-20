@@ -7,7 +7,8 @@ This file contains the DNAStrand class.
 """
 
 from proteinproductionsim.interface import Entity
-from proteinproductionsim.variables import length, scaling, dt, total_time, v_0, pauseDuration, pauseSite, RNAP_size, t_on, tau_0, tau_c
+from proteinproductionsim.variables import length, scaling, dt, total_time, v_0, pauseDuration, pauseSite, RNAP_size, \
+    t_on, tau_0, tau_c
 
 from proteinproductionsim.helper.loading_list import LoadingList
 from proteinproductionsim.helper.supercoilling import s, n_dependence_cubic_3

@@ -3,6 +3,7 @@
 data_recorder.py
 ================
 """
+import matplotlib.axes
 import numpy as np
 
 from ..interface import DataContainer, Environment, Controller
@@ -19,9 +20,9 @@ class DataRecorder(DataContainer):
     :param controller: The controller instance that owns this class. Stored in order to use callback
     :param collection_interval: The integer interval.
     """
-    def __init__(self, controller: Controller, collection_interval):
+    def __init__(self, controller: Controller, target):
         super().__init__(controller)
-        self.collection_interval = collection_interval
+        self.target = target
         pass
 
     def init(self):
@@ -42,7 +43,8 @@ class DataRecorder(DataContainer):
 
 class RNAPPositionRecorder(DataRecorder):
     def __init__(self, controller, target: DNAStrand, total_time: int):
-        super().__init__(controller, int(data_collection_interval/dt))
+        super().__init__(controller, target)
+        self.collection_interval = int(data_collection_interval/dt)
         self._tot_time = total_time + 1
         self._dna = target
         self._dt = dt
@@ -87,7 +89,6 @@ class RNAPPositionRecorder(DataRecorder):
             time_list = np.arange(start=start_index, stop=stop_index,
                                   step=1, dtype=float)
             axe.plot(time_list*self._dt, self._data[i][start_index:stop_index])
-        #print([self._rnap_loaded, self._rnap_detached])
         pass
 
 
@@ -98,7 +99,7 @@ class SingleValueRecorder(DataRecorder):
                  unit_y: str, unit_x: str,
                  data_format: str = "versus_time"
                  ):
-        super().__init__(controller, int(data_collection_interval/dt))
+        super().__init__(controller, None)
         self._tot_time = total_time
         self._targe_function = target_function
         self._data_format = data_format
@@ -130,7 +131,7 @@ class SingleValueRecorder(DataRecorder):
 # Multi-Value Recorder
 class FiveThreeRecorder(DataRecorder):
     def __init__(self, controller, target: DNAStrand, total_time):
-        super().__init__(controller,  int(data_collection_interval/dt))
+        super().__init__(controller,  target)
         self._dna = target
         self._total_time = total_time
         self._name = []
@@ -176,55 +177,54 @@ class SupercoilingRecorder(DataRecorder):
     :param controller: the parent Controller Class
     :param target: the target DNAStrand instance
     :param total_time: the integer total time steps
+    :param rnap_record_amount: the max amount of rnap to record. default is 5
     """
-    def __init__(self, controller, target: DNAStrand, total_time: int, ):
+    def __init__(self, controller, target: DNAStrand, total_time: int, rnap_record_amount: int = 5):
         """
         Constructor method
         """
-        super().__init__(controller, int(data_collection_interval / dt))
+        super().__init__(controller, target)
+        self.collection_interval = 1  # collecting information every 2 seconds
         self._tot_time = total_time + 1
         self._dna = target
+        self._rnap_record_amount = rnap_record_amount
         self._dt = dt
-        self._data = []
-        self._length = 0
-        self._rnap_loaded = 0
-        self._rnap_detached = 0
-        self._start_end = []
+        self._supercoiling_arr = []
+        self._index_arr = []
 
     def log(self, time_index: int):
-        # STEP: check RNAP amount through loaded and attached
-        if time_index % self.collection_interval == 0:
-            # STEP: check if detached increase
-            if self._dna.detached > self._rnap_detached:
-                self._start_end[self._rnap_detached][1] = time_index - 1
-                self._rnap_detached += 1
-            # STEP: check if loaded increase
-            if self._dna.loaded > self._rnap_loaded:
-                self._start_end.append([time_index, -1])
-                self._rnap_loaded += 1
-                self._data.append(np.zeros(self._tot_time))
+        # STEP: check if it is time for checking and recording.
+        if time_index % self.collection_interval == 0 and self._dna.phi is not None:
+            # STEP: check what is the safe amount of rnap to record
+            if self._rnap_record_amount > len(self._dna.RNAP_LIST):
+                check_amount = len(self._dna.RNAP_LIST)
+            else:
+                check_amount = self._rnap_record_amount
 
-        # STEP: now we track the position.
-        for i in range(self._rnap_loaded):
-            if i < self._rnap_detached:
-                continue
-            self._data[i][self._length] = self._dna.RNAP_LIST[i].position
-
-        self._length += 1
-        pass
+            for i in range(check_amount):
+                if len(self._supercoiling_arr) < i+1:
+                    self._supercoiling_arr.append([])
+                    self._index_arr.append([])
+                if not self._dna.RNAP_LIST[i].attached:
+                    continue
+                real_index = i - self._dna.detached
+                self._supercoiling_arr[i].append(self._dna.phi[i] - self._dna.phi[i+1])
+                self._index_arr[i].append(time_index)
 
     def plot(self, axe):
         axe.set_xlabel('Time [s]')
-        axe.set_ylabel('Position [bps]')
+        axe.set_ylabel('Supercoiling')
         axe.set_title('RNAP Position Plot')
         axe.grid(True)
-        for i in range(self._rnap_loaded):
-            start_index = self._start_end[i][0]
-            stop_index = self._start_end[i][1]
-            if stop_index < 0:
-                stop_index = self._tot_time
-            time_list = np.arange(start=start_index, stop=stop_index,
-                                  step=1, dtype=float)
-            axe.plot(time_list * self._dt, self._data[i][start_index:stop_index])
-        # print([self._rnap_loaded, self._rnap_detached])
+        for i in range(len(self._supercoiling_arr)):
+            if i % 10 == 0:
+                label = f"{i + 1}st RNAP"
+            elif i % 10 == 1:
+                label = f"{i + 1}nd RNAP"
+            elif i % 10 == 2:
+                label = f"{i + 1}rd RNAP"
+            else:
+                label = f"{i + 1}th RNAP"
+            axe.plot(np.array(self._index_arr[i])*self._dt, self._supercoiling_arr[i], label=label)
+        axe.legend()
         pass
