@@ -149,7 +149,7 @@ class RNAP(Entity):
         # REASON: increment the RNAP position by the amount pace.
         self.position += pace
 
-        # REASON: check if the RNAP is detached, if so, then set the RNAP position to a ridiculously far place.
+        # REASON: check if the RNAP is detached,
         #         use callback method of the parent DNA to increment the detached amount.
         if self.attached and (self.position >= length):
             self.attached = False

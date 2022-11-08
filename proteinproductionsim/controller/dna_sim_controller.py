@@ -13,7 +13,10 @@ from ..datacontainer.data_recorder import RNAPPositionRecorder, SingleValueRecor
     SupercoilingRecorder
 
 
-class RunConfig:
+class RecordConfig:
+    """
+    This class is used to pass and store data recording setting to the simulator.
+    """
     def __init__(self, controller=None, record_rnap_position: bool = False, record_rnap_amount: bool = False,
                  record_rnap_state: bool = True, record_processing_time: bool = True,
                  record_protein_amount: bool = True, record_protein_production: bool = True,
@@ -33,23 +36,31 @@ class RunConfig:
         self.record_supercoiling = record_supercoiling
 
 
+class RunConfig:
+    """
+    This class is used to pass
+    """
+    def __init__(self):
+        pass
+
+
 class DNASimController(Controller):
     """
     This is the central controller for the DNA simulation.
     """
-    def __init__(self,  rnap_loading_rate: float, config: RunConfig = RunConfig(), **kwargs):
+    def __init__(self, rnap_loading_rate: float, record_config: RecordConfig = RecordConfig(), **kwargs):
         super().__init__()
         # Setup
         self.time_index = 0
         self.env = DNASimEnvironment(controller=self, rnap_loading_rate=rnap_loading_rate,
-                                     if_storing_supercoiling_value=config.record_supercoiling,
+                                     if_storing_supercoiling_value=record_config.record_supercoiling,
                                      **kwargs)
         self.total_time = scaling(total_time)
         self.dt = dt
         self.stage_per_collection = stage_per_collection
 
         # Data Recording Setup
-        self.config = config
+        self.record_config = record_config
 
         # Initialize Data Recorders
         self.data_recorder = {}

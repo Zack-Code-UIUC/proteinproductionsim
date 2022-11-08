@@ -5,6 +5,7 @@ dna_strand.py
 
 This file contains the DNAStrand class.
 """
+from numpy import ndarray
 
 from proteinproductionsim.interface import Entity
 from proteinproductionsim.variables import length, scaling, dt, total_time, v_0, pauseDuration, pauseSite, RNAP_size, \
@@ -19,13 +20,6 @@ import numpy as np
 class DNAStrand(Entity):
     """
     This class represents the DNA strand.
-
-    Parameters
-    ----------
-
-
-    Attributes
-    ----------
     """
     def __init__(self, environment, rnap_loading_rate, include_supercoiling=True, include_busty_promoter=False,
                  rnap_loading_pattern="stochastic", promoter_shut_off_time=-1, pause_profile="flat",
@@ -33,8 +27,8 @@ class DNAStrand(Entity):
                  protein_production_off: bool = False, if_storing_supercoiling_value: bool = False,
                  implemented_t_on: float = t_on):
         super().__init__(environment)
-        self.length = length
-        self.rnap_loading_rate = rnap_loading_rate
+        self.length: int = length
+        self.rnap_loading_rate: float = rnap_loading_rate
 
         # settings
         self.include_supercoiling = include_supercoiling
@@ -52,6 +46,7 @@ class DNAStrand(Entity):
         self.attached = 0  # number of RNAPs that are attached.
         self.degrading = 0  # number of RNAPs that are degrading.
         self.degraded = 0  # number of RNAPs that are already degraded.
+        self.interrupted = 0
 
         # setup loading list.
         if_stochastic = False
@@ -248,6 +243,8 @@ class DNAStrand(Entity):
                 self.degrading += data
             case "degraded":
                 self.degraded += data
+            case "interrupted":
+                self.interrupted += data
 
     def supercoiling(self):
 
@@ -255,7 +252,7 @@ class DNAStrand(Entity):
         size = self.attached
 
         # STEP: phi generation
-        PHI = np.zeros(size+1)
+        PHI: ndarray = np.zeros(size+1)
         for i in range(size + 1):
             j = i + self.detached  # STEP: convert to real index
             if i == 0:  # STEP: check the front-most element
@@ -300,3 +297,8 @@ class DNAStrand(Entity):
             self.velo = velo
             self.stepping = stepping
         return stepping
+
+    def rnap_fall_off(self):
+        
+        return
+
