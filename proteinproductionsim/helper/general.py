@@ -54,3 +54,14 @@ def print_progress_bar(iteration, total):
 
     if iteration == total:
         print()
+
+
+def if_out_of_interval(num, low, high):
+    if low < 0 and num >= high:
+        return True
+    elif high < 0 and num <= -low:
+        return True
+    if low <= num <= high:
+        return False
+    else:
+        return True

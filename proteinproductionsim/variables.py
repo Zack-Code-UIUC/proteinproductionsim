@@ -51,7 +51,7 @@ gamma = 0.01  # supercoiling constant
 v_0 = 30.5  # 30.5
 tau_c = 11
 tau_0 = 0.386
-stalling_supercoiling_lower = -0.01  # lower supercoiling for rnap interruption
+stalling_supercoiling = 0.01  # bound of supercoiling for rnap interruption
 
 
 # Scaling

@@ -40,8 +40,13 @@ class RunConfig:
     """
     This class is used to pass
     """
-    def __init__(self):
-        pass
+    def __init__(self,
+                 rnap_loading_rate: float = 0.127):
+        self.rnap_loading_rate = rnap_loading_rate
+        self.config = {}
+
+    def get(self, key):
+        return self.config[key]
 
 
 class DNASimController(Controller):
@@ -77,15 +82,15 @@ class DNASimController(Controller):
 
     def init(self):
         # adding all the data recorder according to the config
-        if self.config.record_rnap_position:
+        if self.record_config.record_rnap_position:
             self.data_recorder["position"] = RNAPPositionRecorder(self, self.env.dna, self.total_time)
-        if self.config.record_protein_amount:
+        if self.record_config.record_protein_amount:
             self.data_recorder["protein amount"] = SingleValueRecorder(self, self.get_protein_amount, self.total_time,
                                                                        name_x="Time", name_y="Protein Amount",
                                                                        unit_x="s", unit_y="")
-        if self.config.record_five_three:
+        if self.record_config.record_five_three:
             self.data_recorder["five and three"] = FiveThreeRecorder(self, self.env.dna, self.total_time)
-        if self.config.record_supercoiling:
+        if self.record_config.record_supercoiling:
             self.data_recorder["supercoiling"] = SupercoilingRecorder(self, self.env.dna, self.total_time)
 
         self.env.init()
@@ -108,7 +113,7 @@ class DNASimController(Controller):
         return self.env.total_prot
 
     def get_five_three(self):
-        if self.config.record_five_three:
+        if self.record_config.record_five_three:
             return self.data_recorder["five and three"].get_five_six()
         else:
             return None

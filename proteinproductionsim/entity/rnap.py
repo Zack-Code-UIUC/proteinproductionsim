@@ -21,7 +21,7 @@ class RNAP(Entity):
 
     Parameters
     ---------
-    dna : DNAStrand
+    parent : DNAStrand
         the reference of the parent DNA strand
     initial_t : float
         the initial time when this RNAP is attached  or loaded to the DNA strand.
@@ -62,11 +62,12 @@ class RNAP(Entity):
     """
     pauseProb = 0.8
 
-    def __init__(self, dna: Entity, initial_t, pause_profile: str = "flat", ribo_loading_profile: str = "stochastic",
-                 degradation_profile: str = "exponential", protein_production_off: bool = False,
-                 degradation_uniform_lifetime: float = 60.0):
-        super().__init__(dna)
-        self.parent = dna  # this store the reference to its mother DNA, so that callback method can be used.
+    def __init__(self, parent, serial_n: int, initial_t, pause_profile: str = "flat",
+                 ribo_loading_profile: str = "stochastic", degradation_profile: str = "exponential",
+                 protein_production_off: bool = False, degradation_uniform_lifetime: float = 60.0):
+        super().__init__(parent)
+        self.parent = parent  # this store the reference to its mother DNA, so that callback method can be used.
+        self.serial_number = serial_n  # this number is chosen such that each instance should have a unique number.
         self.initial_t = initial_t  # means the initial time when the RNAP attached.
         self.position = 0  # means position.
         self.attached = True  # indicated if the RNAP is attached to the DNA. Will detached if reach the end.
@@ -147,6 +148,8 @@ class RNAP(Entity):
             return 0
 
         # REASON: increment the RNAP position by the amount pace.
+        if pace < 0:
+            print("negative stepping!", pace)
         self.position += pace
 
         # REASON: check if the RNAP is detached,
@@ -154,9 +157,7 @@ class RNAP(Entity):
         if self.attached and (self.position >= length):
             self.attached = False
             self.detached_time = time_index
-            # self.position = length
-            self.parent.call_back(option="attached", data=-1)
-            self.parent.call_back(option="detached")
+            self.parent.call_back(operation="detached", entity=self)
 
         # REASON: check for degradation initiation. check for initiation, which allow the loading of Ribosome.
         #         check for loading of Ribosome on the mRNA.
@@ -165,7 +166,7 @@ class RNAP(Entity):
             #         if the time has exceeded the degradation time, then the degrading state will be mark True.
             if time_index >= self.t_degrade + self.initial_t:
                 self.degrading = True
-                self.parent.call_back(option="degrading")
+                self.parent.call_back(operation="degrading", entity=self)
 
             # REASON: check for self.initiated,
             #         if the RNAP instance is not initiated, and it satisfies to requirement to be initiated
@@ -193,7 +194,7 @@ class RNAP(Entity):
         #         third all the ribosome has to be already detached from the mRNA
         if not self.attached and self.degrading and self.RIBO_LIST.if_all_detached():
             self.degraded = True
-            self.parent.call_back(option="degraded")
+            self.parent.call_back(operation="degraded", entity=self)
         # return protein production
         return prot
 
