@@ -239,7 +239,7 @@ class SupercoilingRecorder(DataRecorder):
         axe.set_ylabel('Supercoiling')
         axe.set_title('RNAP Supercoiling Plot')
         axe.grid(True)
-        for i in range(min(self._size, self.rnap_record_amount)):
+        for i in range(max(self._size-self.rnap_record_amount, 0), self._size):
             label = format_n_th_rnap(self._processed_serial_numbers[i])
             axe.plot(self._processed_time_list[i], self._processed_supercoiling[i], label=label)
         pass
